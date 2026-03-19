@@ -10,18 +10,18 @@ def remove_idle(circuit: qiskit.QuantumCircuit) -> Tuple[qiskit.QuantumCircuit, 
                 candidates.remove(q1)
             if q2 in candidates:
                 candidates.remove(q2)
-    candidates = sorted(candidates, key=lambda x: x._index)
+    # candidates = sorted(candidates, key=lambda x: x._index)
     not_candidates = list(set(circuit.qubits) - set(candidates))
-    not_candidates = sorted(not_candidates, key=lambda x: x._index)
+    # not_candidates = sorted(not_candidates, key=lambda x: x._index)
 
     qubits_to_bools = {}
     for inst in circuit.data:
         if len(set(inst.qubits) & set(candidates)) != 0:
             if inst.name == 'x':
-                qubits_to_bools[inst.qubits[0]._index] = True
+                qubits_to_bools[inst.qubits[0]] = True
     for candidate in candidates:
-        if candidate._index not in qubits_to_bools.keys():
-            qubits_to_bools[candidate._index] = False
+        if candidate not in qubits_to_bools.keys():
+            qubits_to_bools[candidate] = False
 
     new_ckt = qiskit.QuantumCircuit(not_candidates)
     for inst in circuit.data:
