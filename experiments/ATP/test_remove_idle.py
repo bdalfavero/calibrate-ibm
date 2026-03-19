@@ -11,7 +11,7 @@ class TestRemoveIdle(unittest.TestCase):
         ckt.cx(0, 1)
         ckt.cx(1, 2)
         ckt.cx(1, 0)
-        removed_ckt = remove_idle(ckt)
+        _, removed_ckt = remove_idle(ckt)
         ckt_u = Operator(ckt).data
         removed_u = Operator(removed_ckt).data
         self.assertTrue(np.allclose(ckt_u, removed_u))
@@ -21,7 +21,7 @@ class TestRemoveIdle(unittest.TestCase):
         ckt.cx(0, 2)
         ckt.cx(2, 0)
         ckt.x(1)
-        removed_ckt = remove_idle(ckt)
+        _, removed_ckt = remove_idle(ckt)
         target_ckt = qiskit.QuantumCircuit(2)
         target_ckt.cx(0, 1)
         target_ckt.cx(1, 0)
@@ -36,7 +36,7 @@ class TestRemoveIdle(unittest.TestCase):
         ckt.cx(0, 2)
         ckt.cx(2, 0)
         ckt.x(1)
-        removed_ckt = remove_idle(ckt)
+        _, removed_ckt = remove_idle(ckt)
         target_ckt = qiskit.QuantumCircuit(2)
         target_ckt.h(0)
         target_ckt.cx(0, 1)
@@ -44,6 +44,38 @@ class TestRemoveIdle(unittest.TestCase):
         target_u = Operator(target_ckt).data
         removed_u = Operator(removed_ckt).data
         self.assertTrue(np.allclose(target_u, removed_u))
+
+
+class TestBools(unittest.TestCase):
+
+    def test_no_idle(self):
+        ckt = qiskit.QuantumCircuit(3)
+        ckt.cx(0, 1)
+        ckt.cx(1, 2)
+        ckt.cx(1, 0)
+        bools, _ = remove_idle(ckt)
+        target_bools = []
+        self.assertTrue(bools == target_bools)
+
+    def test_one_idle(self):
+        ckt = qiskit.QuantumCircuit(3)
+        ckt.cx(0, 2)
+        ckt.cx(2, 0)
+        ckt.x(1)
+        bools, _ = remove_idle(ckt)
+        target_bools = [True]
+        self.assertTrue(target_bools == bools)
+
+    def test_two_idle(self):
+        ckt = qiskit.QuantumCircuit(4)
+        ckt.h(3)
+        ckt.h(0)
+        ckt.cx(0, 2)
+        ckt.cx(2, 0)
+        ckt.x(1)
+        bools, _ = remove_idle(ckt)
+        target_bools = [True, False]
+        self.assertTrue(bools == target_bools)
 
 if __name__ == "__main__":
     unittest.main()
