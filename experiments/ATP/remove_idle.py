@@ -1,7 +1,7 @@
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 import qiskit
 
-def remove_idle(circuit: qiskit.QuantumCircuit) -> Tuple[qiskit.QuantumCircuit, List[bool]]:
+def remove_idle(circuit: qiskit.QuantumCircuit) -> Tuple[qiskit.QuantumCircuit, Dict[int, bool]]:
     candidates = circuit.qubits.copy() # List of qubits that are not entangled with the "bulk".
     for inst in circuit.data:
         if len(inst.qubits) == 2:
@@ -18,17 +18,16 @@ def remove_idle(circuit: qiskit.QuantumCircuit) -> Tuple[qiskit.QuantumCircuit, 
     for inst in circuit.data:
         if len(set(inst.qubits) & set(candidates)) != 0:
             if inst.name == 'x':
-                qubits_to_bools[inst.qubits[0]] = True
+                qubits_to_bools[inst.qubits[0]._index] = True
     for candidate in candidates:
-        if candidate not in qubits_to_bools.keys():
-            qubits_to_bools[candidate] = False
-    bools = [qubits_to_bools[q] for q in candidates]
+        if candidate._index not in qubits_to_bools.keys():
+            qubits_to_bools[candidate._index] = False
 
     new_ckt = qiskit.QuantumCircuit(not_candidates)
     for inst in circuit.data:
         if len(set(inst.qubits) & set(candidates)) == 0:
             new_ckt.append(inst, inst.qubits)
-    return bools, new_ckt
+    return qubits_to_bools, new_ckt
 
 
 if __name__ == "__main__":

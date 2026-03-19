@@ -54,7 +54,7 @@ class TestBools(unittest.TestCase):
         ckt.cx(1, 2)
         ckt.cx(1, 0)
         bools, _ = remove_idle(ckt)
-        target_bools = []
+        target_bools = {}
         self.assertTrue(bools == target_bools)
 
     def test_one_idle(self):
@@ -63,7 +63,7 @@ class TestBools(unittest.TestCase):
         ckt.cx(2, 0)
         ckt.x(1)
         bools, _ = remove_idle(ckt)
-        target_bools = [True]
+        target_bools = {1: True}
         self.assertTrue(target_bools == bools)
 
     def test_two_idle(self):
@@ -74,7 +74,7 @@ class TestBools(unittest.TestCase):
         ckt.cx(2, 0)
         ckt.x(1)
         bools, _ = remove_idle(ckt)
-        target_bools = [True, False]
+        target_bools = {1: True, 3: False}
         self.assertTrue(bools == target_bools)
 
 if __name__ == "__main__":
