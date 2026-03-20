@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import qiskit
 from qiskit.quantum_info import Operator
-from remove_idle import remove_idle
+from remove_idle import remove_idle, merge_idle_bits
 
 class TestRemoveIdle(unittest.TestCase):
 
@@ -76,6 +76,41 @@ class TestBools(unittest.TestCase):
         bools, _ = remove_idle(ckt)
         target_bools = {1: True, 3: False}
         self.assertTrue(bools == target_bools)
+
+
+class TestMergeIdle(unittest.TestCase):
+
+    def test_one_idle(self):
+        idle_bools = {1: False}
+        active_inds = [0, 2]
+        active_bools = np.array([
+            [1, 0],
+            [0, 1],
+            [1, 1]
+        ]).astype(bool)
+        target_bools = np.array([
+            [1, 0, 0],
+            [0, 0, 1],
+            [1, 0, 1]
+        ]).astype(bool)
+        merged_bools = merge_idle_bits(active_inds, active_bools, idle_bools)
+        self.assertTrue(np.allclose(target_bools, merged_bools))
+
+    def test_two_idle(self):
+        idle_bools = {1: False, 3: True}
+        active_inds = [0, 2]
+        active_bools = np.array([
+            [1, 0],
+            [0, 1],
+            [1, 1]
+        ]).astype(bool)
+        target_bools = np.array([
+            [1, 0, 0, 1],
+            [0, 0, 1, 1],
+            [1, 0, 1, 1]
+        ]).astype(bool)
+        merged_bools = merge_idle_bits(active_inds, active_bools, idle_bools)
+        self.assertTrue(np.allclose(target_bools, merged_bools))
 
 if __name__ == "__main__":
     unittest.main()
